@@ -1,0 +1,338 @@
+---
+
+title: "Roteiro_aula_pratica"
+author: "Ramon de Araujo Soares"
+format: html
+editor: visual
+---
+
+# Aula prática - Estudo de caso utilizando regressão linear múltipla
+
+## Roteiro:
+
+1.  Introdução
+2.  Github - ferramenta de armazenamento, versionamento e trabalho em equipe.
+3.  Apresentação do caso e descrição dos passos para criação do modelo e análise.
+4.  Atividade prática
+
+## Etapas (passo-a-passo)
+
+1.  Preparação e tratamento dos dados
+
+    1.  Reunir dados de arquivos diferentes em um mesmo dataframe
+
+    2.  Excluir campos vazios
+
+    3.  Excluir dados extremos
+
+2.  Descrever os dados
+
+3.  Compreender as relações entre as variáveis
+
+4.  Expressar as hipóteses
+
+5.  Verificar pressupostos da regressão
+
+6.  Calcular amostra
+
+7.  Modelar e analisar regressão
+
+8.  Interpretar os dados
+
+## Caso
+
+Você é um(a) analista de logística em uma empresa e está preocupado(a) com o aumento dos **custos de frete**, que têm impactado negativamente os resultados financeiros. Para entender melhor os fatores que influenciam esses custos, você decide usar a ferramenta de **regressão múltipla** e criar um modelo estatístico capaz de quantificar o impacto de variáveis operacionais como distância percorrida e peso da carga. Após uma exploração inicial dos dados que tinha à disposição, você conseguiu extrair dos sistemas de informação da empresa dois relatórios contendo dados relevantes, que serão utilizados para estruturar sua pesquisa e apoiar decisões estratégicas voltadas à redução de custos e aumento da eficiência logística.
+
+Os arquivos extraídos do sistema foram:\
+relatorio1.csv\
+relatorio2.csv
+
+As variáveis a serem utilizadas no estudo estão listadas a seguir.
+
+**Variável dependente:**
+
+Custo de transporte (custo_frete)
+
+**Variáveis independentes:**
+
+Distância (distancia_km)\
+Peso da carga (peso_carga_kg)\
+Consumo de combustível (consumo_combustivel_kml)\
+Temperatura do ambiente (temperatura_ambiente)\
+Horário do envio (hora_envio)
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+## 1. Preparação e tratamento dos dados
+
+### 0. Carregar bibliotecas que serão utilizadas
+
+Instalar previamente as bibliotecas que ainda não tem: Usar install.packages(c("", "", "", "")) ou, no painel do RStudio, pela aba 'Packages'
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(carData)
+library(car)
+library(ggplot2)
+library(corrplot)
+library(lmtest)
+library(pwr)
+
+```
+
+### 1.1. Tratamento dos dados
+
+#### Reunir dados dos arquivos em um dataframe
+
+```{r}
+
+relatorio1 <- read.csv("relatorio1.csv")
+relatorio2 <- read.csv("relatorio2.csv")
+
+dadoscombinados <- merge(relatorio1, relatorio2, by = "id")
+
+# Visualizar cabeçalho para conferir se a extração foi correta:
+head(relatorio1)
+head(relatorio2)
+head(dadoscombinados)
+
+
+```
+
+#### Excluir campos vazios
+
+1.  Identificar quantas entradas têm campos vazios (campos com valor NA)
+2.  Retirar entradas com campos vazios
+
+```{r}
+
+#contar quantas entradas em 'dadoscombinados' tem campos vazios
+sum(is.na(dadoscombinados))
+
+#criar novo conjunto de dados retirando campos vazios de 'dadoscombinados'
+dados_trata_NA <- dadoscombinados %>% tidyr::drop_na()
+
+#contar quantas entradas tem campos vazios no novo conjunto de dados criado (verificar se é 0!)
+sum(is.na(dados_trata_NA)) 
+```
+
+#### Identificar e tratar dados extremos
+
+Listar os outliers de cada variável. \
+Considerar outliers valores maiores que 3 desvios padrão.\
+\* Listar outliers antes e depois do tratamento, para verificar se o tratamento foi feito
+
+```{r}
+# Variáveis do dataframe
+variaveis <- c("custo_frete", "distancia_km", "peso_carga_kg", "consumo_combustivel_kml", "temperatura_ambiente", "hora_envio")
+
+# Função para identificar outliers (3 desvios padrão)
+identificar_outliers <- function(data, variaveis) {
+  outliers_list <- list()
+  
+  # Loop por cada variável especificada
+  for (coluna in variaveis) {
+    media <- mean(data[[coluna]], na.rm = TRUE)
+    desvio_padrao <- sd(data[[coluna]], na.rm = TRUE)
+    
+    # Identificar os outliers
+    outliers <- data[
+      data[[coluna]] < (media - 3 * desvio_padrao) |
+      data[[coluna]] > (media + 3 * desvio_padrao),
+      coluna,
+      drop = FALSE
+    ]
+    
+    # Armazenar os outliers
+    outliers_list[[coluna]] <- outliers
+  }
+  return(outliers_list)
+}
+
+# Identificar os outliers antes do tratamento
+outliers_antes <- identificar_outliers(dados_trata_NA, variaveis)
+
+# Remover os outliers do dataframe
+remover_outliers <- function(data, variaveis) {
+  for (coluna in variaveis) {
+    media <- mean(data[[coluna]], na.rm = TRUE)
+    desvio_padrao <- sd(data[[coluna]], na.rm = TRUE)
+    
+    # Filtrar os valores dentro de 3 desvios padrão
+    data <- data[
+      data[[coluna]] >= (media - 3 * desvio_padrao) &
+      data[[coluna]] <= (media + 3 * desvio_padrao),
+      , drop = FALSE
+    ]
+  }
+  return(data)
+}
+
+# Aplicar o tratamento de outliers
+dados_trata_final <- remover_outliers(dados_trata_NA, variaveis)
+
+# Identificar os outliers depois do tratamento (deve ser vazio)
+outliers_depois <- identificar_outliers(dados_trata_final, variaveis)
+
+# Exibir os outliers antes e depois do tratamento
+cat("Outliers antes do tratamento:\n")
+print(outliers_antes)
+
+cat("\nOutliers depois do tratamento:\n")
+print(outliers_depois)
+
+
+```
+
+**ATIVIDADE:\
+Criar gráfico boxplot para visualizar os outliers de cada variável antes do tratamento**
+
+```{r}
+
+# Função para criar boxplots no RStudio (dados antes do tratamento)
+criar_boxplots_antes <- function(data_antes, variaveis) {
+  for (coluna in variaveis) {
+    # Criar dataframe para a variável
+    data_plot <- data.frame(
+      Valor = data_antes[[coluna]],
+      Variavel = coluna
+    )
+    
+    # Gerar o boxplot
+    print(
+      ggplot(data_plot, aes(x = Variavel, y = Valor)) +
+        geom_boxplot(outlier.color = "red", outlier.size = 2, fill = "skyblue") +
+        labs(title = paste("Boxplot Antes do Tratamento -", coluna),
+             x = "Variável",
+             y = "Valores") +
+        theme_minimal()
+    )
+  }
+}
+
+# Chamar a função para criar e visualizar os boxplots
+criar_boxplots_antes(dados_trata_NA, variaveis)
+
+```
+
+## 2. Descrição dos dados - Resumo estatístico
+
+```{r}
+
+summary(dados_trata_final)
+
+```
+
+## 3. Compreensão da relação entre as variáveis
+
+Gerar a matriz de correlação para avaliar as relações entre as variáveis.
+
+```{r}
+# Matriz de correlações
+correlacoes <- cor(dados_trata_final[, c("custo_frete", "distancia_km", "peso_carga_kg","consumo_combustivel_kml", "temperatura_ambiente", "hora_envio")])
+
+print(correlacoes)
+
+
+```
+
+**ATIVIDADE: \
+Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação**
+
+```{r}
+corrplot(correlacoes, method = "color", type = "lower", 
+         tl.col = "black", tl.srt = 45, addCoef.col = "black", 
+         title = "Matriz de Correlação", mar = c(0, 0, 1, 0), 
+         cl.pos = "b", col = corrplot::COL2("RdYlBu"))
+```
+
+## 4. Hipóteses
+
+-   **Hipótese Nula (H0)**: Não há relação significativa entre as variáveis independentes (distância, peso da carga, etc.) e o custo do frete.
+
+-   **Hipótese Alternativa (H1**): Ao menos uma variável tem relação significativa com o custo do frete.
+
+## 5. Verificar pressupostos da regressão - garantir validade do modelo
+
+Examinar a ausência de multicolinearidade (VIF ou matriz de correlação). \
+Abaixo de 5: multicolinearidade baixa\
+Acima de 5: multicolinearidade. Rever modelo
+
+```{r}
+modelo_vif <- lm(custo_frete ~ distancia_km + peso_carga_kg + consumo_combustivel_kml + temperatura_ambiente + hora_envio, data = dados_trata_final)
+vif(modelo_vif)
+```
+
+Linearidade: O relacionamento entre a variável dependente e as variáveis independentes deve ser linear
+
+```{r}
+plot(modelo_vif$fitted.values, residuals(modelo_vif), 
+     main = "Resíduos vs Valores Preditos", 
+     xlab = "Valores Preditos", ylab = "Resíduos")
+abline(h = 0, col = "red")
+```
+
+Independência dos erros: Os resíduos devem ser independentes entre si.\
+Verificar a interdependência com o teste Durbin-Watson. Se os resultados forem próximos de 2, podemos considerar ausência de autocorrelação serial
+
+```{r}
+durbinWatsonTest(modelo_vif)
+```
+
+Homoscedasticidade: A variância dos resíduos deve ser constante em todos os níveis de valores previstos
+
+```{r}
+bptest(modelo_vif)
+```
+
+Verificar a normalidade dos resíduos.
+
+```{r}
+
+#Gráfico Q-Q
+residuos <- residuals(modelo_vif)
+ggplot(data.frame(residuos), aes(sample = residuos)) +
+  stat_qq(color = "blue", size = 2) +  # Pontos do gráfico Q-Q
+  stat_qq_line(color = "red", linetype = "dashed", size = 1) +  # Linha de referência
+  labs(title = "Q-Q Plot dos Resíduos", 
+       x = "Quantis Teóricos", 
+       y = "Quantis dos Resíduos") +
+  theme_minimal()
+
+#Histograma
+hist(residuals(modelo_vif), main = "Histograma dos Resíduos", xlab = "Resíduos")
+
+# Teste de Shapiro-Wilk
+shapiro.test(residuals(modelo_vif))
+```
+
+## 6. Cálculo da amostra - verificar se o tamanho da amostra é adequado
+
+Estimar o tamanho mínimo necessário com base nos preditores e no poder estatístico.
+
+N=v+u+1\
+*(Tamanho mínimo da amostra é: graus de liberdade residual + nível de significância + 1)*
+
+```{r}
+amostra <- pwr.f2.test(u = 5, v = NULL, f2 = 0.15, sig.level = 0.05, power = 0.8)
+print(amostra)
+
+N <- 85.21+5+1
+print(N)
+```
+
+## 7. Modelagem e análise da regressão 
+
+#### ANOVA
+
+#### Betas
+
+#### p-valor de cada beta
+
+#### R²
+
+#### Equação da reta 
+
+## 8. Implicações e conclusões
