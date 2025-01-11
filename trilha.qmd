@@ -1,5 +1,4 @@
 ---
-
 title: "Roteiro_aula_pratica"
 author: "Ramon de Araujo Soares"
 format: html
@@ -61,11 +60,11 @@ Consumo de combustível (consumo_combustivel_kml)\
 Temperatura do ambiente (temperatura_ambiente)\
 Horário do envio (hora_envio)
 
----------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 ## 1. Preparação e tratamento dos dados
 
-### 0. Carregar bibliotecas que serão utilizadas
+### 1.0. Carregar bibliotecas que serão utilizadas
 
 Instalar previamente as bibliotecas que ainda não tem: Usar install.packages(c("", "", "", "")) ou, no painel do RStudio, pela aba 'Packages'
 
@@ -120,7 +119,7 @@ sum(is.na(dados_trata_NA))
 
 #### Identificar e tratar dados extremos
 
-Listar os outliers de cada variável. \
+Listar os outliers de cada variável.\
 Considerar outliers valores maiores que 3 desvios padrão.\
 \* Listar outliers antes e depois do tratamento, para verificar se o tratamento foi feito
 
@@ -238,7 +237,7 @@ print(correlacoes)
 
 ```
 
-**ATIVIDADE: \
+**ATIVIDADE:\
 Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação**
 
 ```{r}
@@ -256,25 +255,28 @@ corrplot(correlacoes, method = "color", type = "lower",
 
 ## 5. Verificar pressupostos da regressão - garantir validade do modelo
 
-Examinar a ausência de multicolinearidade (VIF ou matriz de correlação). \
-Abaixo de 5: multicolinearidade baixa\
-Acima de 5: multicolinearidade. Rever modelo
+5.1 Ausência de multicolinearidade (VIF ou matriz de correlação).
+
+-   Abaixo de 5: multicolinearidade baixa; Acima de 5: multicolinearidade. Rever modelo
 
 ```{r}
 modelo_vif <- lm(custo_frete ~ distancia_km + peso_carga_kg + consumo_combustivel_kml + temperatura_ambiente + hora_envio, data = dados_trata_final)
 vif(modelo_vif)
+
 ```
 
-Linearidade: O relacionamento entre a variável dependente e as variáveis independentes deve ser linear
+5.2 Linearidade: O relacionamento entre a variável dependente e as variáveis independentes deve ser linear
 
 ```{r}
 plot(modelo_vif$fitted.values, residuals(modelo_vif), 
      main = "Resíduos vs Valores Preditos", 
      xlab = "Valores Preditos", ylab = "Resíduos")
 abline(h = 0, col = "red")
+
 ```
 
-Independência dos erros: Os resíduos devem ser independentes entre si.\
+Independência dos erros: Os resíduos devem ser independentes entre si.
+
 Verificar a interdependência com o teste Durbin-Watson. Se os resultados forem próximos de 2, podemos considerar ausência de autocorrelação serial
 
 ```{r}
@@ -323,16 +325,29 @@ N <- 85.21+5+1
 print(N)
 ```
 
-## 7. Modelagem e análise da regressão 
+## 7. Modelagem e análise da regressão
 
-#### ANOVA
+```{r}
+# Ajustar o modelo de regressão
+modelo <- lm(custo_frete ~ distancia_km + peso_carga_kg + consumo_combustivel_kml +
+               temperatura_ambiente + hora_envio, data = dados_trata_final)
 
-#### Betas
+# Resumo do modelo
+summary(modelo)
 
-#### p-valor de cada beta
+# ANOVA do modelo
+anova(modelo)
+```
 
-#### R²
+**ATIVIDADE\
+Escreva a equação da regressão**
 
-#### Equação da reta 
+Custo Frete=−46.67 + 4.92\*distancia_km + 0.11\*peso_carga_kg + 192.45\*consumo_combustivel_kml + 1.63\*temperatura_ambiente + 0.61\*hora_envio
 
 ## 8. Implicações e conclusões
+
+**temperatura_ambiente** e **hora_envio** não são estatisticamente significativos, pois p\>0.05; ou seja, tem impacto irrelevante no modelo.
+
+Teste F Global mostrou um p-valor próximo de 0, mostrando que ao menos uma das variáveis independentes tem impacto significativo no custo do frete.
+
+R2 0.8375 e R2 ajustado de 0.8367, demonstrando que o modelo é consistente e tem um alto valor explicativo, apesar da pequena penalização pela inclusão de variáveis irrelevantes.
