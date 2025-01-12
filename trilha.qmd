@@ -262,7 +262,7 @@ print(correlacoes)
 
 **ATIVIDADE:\
 Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação\
-**Obs: use a função de correlação para os dados tratados finais: cor(dados_trata_final\[, c("var1", "var2", "var3" etc)\]) \
+**Obs: use a função de correlação para os dados tratados finais: cor(dados_trata_final\[, c("var1", "var2", "var3" etc)\])\
 Você também pode usar o vetor que eu já criei anteriormente que guardou esses valores de correlação
 
 ```{r}
