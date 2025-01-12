@@ -1,7 +1,7 @@
 ---
 title: "Roteiro aula pratica"
 author: "Ramon de Araujo Soares"
-format: html
+format: pdf
 editor: visual
 ---
 
@@ -208,7 +208,8 @@ print(outliers_depois)
 Refazer o tratamento de dados**
 
 **ATIVIDADE:\
-Criar gráfico boxplot para visualizar os outliers de cada variável antes do tratamento**
+Criar gráfico boxplot para visualizar os outliers de cada variável antes do tratamento\
+**obs: vetor dos dados a ser utilizado é 'dados_trata_NA_nega
 
 ```{r}
 
@@ -260,7 +261,9 @@ print(correlacoes)
 ```
 
 **ATIVIDADE:\
-Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação**
+Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação\
+**Obs: use a função de correlação para os dados tratados finais: cor(dados_trata_final\[, c("var1", "var2", "var3" etc)\]) \
+Você também pode usar o vetor que eu já criei anteriormente que guardou esses valores de correlação
 
 ```{r}
 corrplot(correlacoes, method = "color", type = "lower", 
@@ -269,17 +272,9 @@ corrplot(correlacoes, method = "color", type = "lower",
          cl.pos = "b", col = corrplot::COL2("RdYlBu"))
 ```
 
-## 4. Hipóteses
+## 4. Verificar pressupostos da regressão - garantir validade do modelo
 
-O teste de hipótese é importante para o modelo porque, com ele, testamos a significância dos coeficientes de regressão. Avalia se a relação entre as variáveis dependente e independentes tem relação ou se ocorrem por acaso.
-
--   **Hipótese Nula (H0)**: Não há relação significativa entre as variáveis independentes (distância, peso da carga, etc.) e o custo do frete.
-
--   **Hipótese Alternativa (H1**): Ao menos uma variável tem relação significativa com o custo do frete.
-
-## 5. Verificar pressupostos da regressão - garantir validade do modelo
-
-### 5.1 Ausência de multicolinearidade (VIF ou matriz de correlação).
+### 4.1 Ausência de multicolinearidade (VIF ou matriz de correlação).
 
 Fator de Inflação da Variância (VIF): mede o quanto a variância de um coeficiente de regressão é inflada devido à multicolinearidade
 
@@ -293,7 +288,7 @@ vif(modelo_vif)
 
 ```
 
-### 5.2 Linearidade
+### 4.2 Linearidade
 
 O relacionamento entre a variável dependente e as variáveis independentes deve ser linear. Desse modo, a mudança na variável dependente será proporcional à mudança de cada variável independente, enquanto as outras forem constantes.
 
@@ -305,7 +300,7 @@ abline(h = 0, col = "red")
 
 ```
 
-### **5.3 Independência dos erros**
+### **4.3 Independência dos erros**
 
 Os resíduos devem ser independentes entre si; o erro de uma observação não deve estar relacionado ao valor do erro de outra observação.
 
@@ -315,7 +310,7 @@ Verificar a interdependência com o teste Durbin-Watson. Se os resultados forem 
 durbinWatsonTest(modelo_vif)
 ```
 
-### 5.4 Homocedasticidade
+### 4.4 Homocedasticidade
 
 A variância dos resíduos deve ser constante em todos os níveis de valores previstos. Ou seja, a dispersão dos pontos em torno da linha de regressão deve ser similar a toda a extensão dos dados.
 
@@ -325,7 +320,7 @@ Usando o teste Breusch-Pagan: p-valor deve ser maior do que o nível de signific
 bptest(modelo_vif)
 ```
 
-### 5.5 Verificar a normalidade dos resíduos
+### 4.5 Verificar a normalidade dos resíduos
 
 Os erros devem seguir uma distribuição normal.
 
@@ -355,7 +350,7 @@ ggplot(data.frame(residuos), aes(sample = residuos)) +
 
 ```
 
-## 6. Cálculo da amostra - verificar se o tamanho da amostra é adequado
+## 5. Cálculo da amostra - verificar se o tamanho da amostra é adequado
 
 Estimar o tamanho mínimo necessário com base nos preditores e no poder estatístico.
 
@@ -369,6 +364,14 @@ print(amostra)
 N <- 85.21+5+1
 print(N)
 ```
+
+## 6. Hipóteses
+
+O teste de hipótese é importante para o modelo porque, com ele, testamos a significância dos coeficientes de regressão. Avalia se a relação entre as variáveis dependente e independentes tem relação ou se ocorrem por acaso.
+
+-   **Hipótese Nula (H0)**: Não há relação significativa entre as variáveis independentes (distância, peso da carga, etc.) e o custo do frete.
+
+-   **Hipótese Alternativa (H1**): Ao menos uma variável tem relação significativa com o custo do frete.
 
 ## 7. Modelagem e análise da regressão
 
