@@ -1,9 +1,11 @@
 ---
-title: "Roteiro para aula pratica - Métodos quantitativos aplicados à administração"
-author: "Ramon de Araujo Soares"
-format: pdf
+title: "Aula pratica - Métodos quantitativos aplicados à administração"
+author: "?"
+format: html
 editor: visual
 ---
+
+*Atenção para as atividades a serem desenvolvidas em cada etapa deste arquivo! Verifique os espaços a serem preenchidos e os 'chunks' de códigos com instruções.*
 
 # Caso prático - utilização da regressão linear múltipla
 
