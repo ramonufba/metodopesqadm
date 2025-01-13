@@ -1,42 +1,37 @@
 ---
-title: "Roteiro aula pratica"
+title: "Roteiro para aula pratica - Métodos quantitativos aplicados à administração"
 author: "Ramon de Araujo Soares"
 format: pdf
 editor: visual
 ---
 
-# Aula prática - Estudo de caso utilizando regressão linear múltipla
+# Caso prático - utilização da regressão linear múltipla
 
 ## Roteiro:
 
 1.  Introdução
 2.  Github - ferramenta de armazenamento, versionamento e trabalho em equipe.
-3.  Apresentação do caso e descrição dos passos para criação do modelo e análise.
-4.  Atividade prática
+3.  Uso de inteligência artificial generativa
+4.  Apresentação do caso e descrição dos passos para criação do modelo e análise.
+5.  Atividade prática
 
 ## Etapas (passo-a-passo)
 
-1.  Preparação e tratamento dos dados
-
-    1.  Reunir dados de arquivos diferentes em um mesmo dataframe
-
-    2.  Excluir campos vazios
-
-    3.  Excluir dados extremos
+1.  Preparar e tratar os dados
 
 2.  Descrever os dados
 
-3.  Compreender as relações entre as variáveis
+3.  Analisar correlação entre as variáveis
 
-4.  Expressar as hipóteses
+4.  Verificar pressupostos da regressão
 
-5.  Verificar pressupostos da regressão
+5.  Calcular amostra
 
-6.  Calcular amostra
+6.  Expressar as hipóteses da regressão
 
 7.  Modelar e analisar regressão
 
-8.  Interpretar os dados
+8.  Interpretar e relatar os resultados
 
 ## Caso
 
@@ -62,13 +57,13 @@ Horário do envio (hora_envio)
 
 ------------------------------------------------------------------------
 
-## 
-
 ## 0. Carregar bibliotecas que serão utilizadas
 
-Atenção: Verifique as bibliotecas necessárias já foram instaladas previamente. Comando library() ou na interface gráfica do RStudio - Packages
+Verifique as bibliotecas necessárias já foram instaladas previamente. Comando library() ou na interface gráfica do RStudio - Packages
 
 Se precisar instalar: Usar install.packages(c("", "", "", "")) ou, no painel do RStudio, pela aba 'Packages'
+
+Atenção para os possíveis conflitos que podem acontecer ao carregar mais de uma biblioteca! Isso pode demandar ajustes no uso de alguma função.
 
 ```{r}
 
@@ -82,7 +77,7 @@ library(pwr)
 library(tidyr)
 ```
 
-## 1. Tratamento dos dados
+## 1. Tratar os dados
 
 #### 1.1 Reunir dados dos arquivos em um dataframe
 
@@ -211,34 +206,6 @@ Refazer o tratamento de dados**
 Criar gráfico boxplot para visualizar os outliers de cada variável antes do tratamento\
 **obs: vetor dos dados a ser utilizado é 'dados_trata_NA_nega
 
-```{r}
-
-# Função para criar boxplots no RStudio (dados antes do tratamento)
-criar_boxplots_antes <- function(data_antes, variaveis) {
-  for (coluna in variaveis) {
-    # Criar dataframe para a variável
-    data_plot <- data.frame(
-      Valor = data_antes[[coluna]],
-      Variavel = coluna
-    )
-    
-    # Gerar o boxplot
-    print(
-      ggplot(data_plot, aes(x = Variavel, y = Valor)) +
-        geom_boxplot(outlier.color = "red", outlier.size = 2, fill = "skyblue") +
-        labs(title = paste("Boxplot Antes do Tratamento -", coluna),
-             x = "Variável",
-             y = "Valores") +
-        theme_minimal()
-    )
-  }
-}
-
-# Chamar a função para criar e visualizar os boxplots
-criar_boxplots_antes(dados_trata_NA_nega, variaveis)
-
-```
-
 ## 2. Descrição dos dados - Resumo estatístico
 
 ```{r}
@@ -247,7 +214,7 @@ summary(dados_trata_final)
 
 ```
 
-## 3. Compreensão da relação entre as variáveis
+## 3. Análise de correlação entre as variáveis
 
 Gerar a matriz de correlação para avaliar as relações entre as variáveis.
 
@@ -264,13 +231,6 @@ print(correlacoes)
 Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação\
 **Obs: use a função de correlação para os dados tratados finais: cor(dados_trata_final\[, c("var1", "var2", "var3" etc)\])\
 Você também pode usar o vetor que eu já criei anteriormente que guardou esses valores de correlação
-
-```{r}
-corrplot(correlacoes, method = "color", type = "lower", 
-         tl.col = "black", tl.srt = 45, addCoef.col = "black", 
-         title = "Matriz de Correlação", mar = c(0, 0, 1, 0), 
-         cl.pos = "b", col = corrplot::COL2("RdYlBu"))
-```
 
 ## 4. Verificar pressupostos da regressão - garantir validade do modelo
 
@@ -300,7 +260,7 @@ abline(h = 0, col = "red")
 
 ```
 
-### **4.3 Independência dos erros**
+### 4.3 Independência dos erros
 
 Os resíduos devem ser independentes entre si; o erro de uma observação não deve estar relacionado ao valor do erro de outra observação.
 
@@ -337,20 +297,7 @@ Outra forma interessante de verificar a normalidade dos resíduos é a análise 
 **ATIVIDADE:\
 Desenvolva o gráfico Q-Q para o vetor 'modelo_vif'**
 
-```{r}
-#Gráfico Q-Q
-residuos <- residuals(modelo_vif)
-ggplot(data.frame(residuos), aes(sample = residuos)) +
-  stat_qq(color = "blue", size = 2) +  # Pontos do gráfico Q-Q
-  stat_qq_line(color = "red", linetype = "dashed", size = 1) +  # Linha de referência
-  labs(title = "Q-Q Plot dos Resíduos", 
-       x = "Quantis Teóricos", 
-       y = "Quantis dos Resíduos") +
-  theme_minimal()
-
-```
-
-## 5. Cálculo da amostra - verificar se o tamanho da amostra é adequado
+## 5. Calcular a amostra - verificar se o tamanho da amostra é adequado
 
 Estimar o tamanho mínimo necessário com base nos preditores e no poder estatístico.
 
@@ -373,7 +320,7 @@ O teste de hipótese é importante para o modelo porque, com ele, testamos a sig
 
 -   **Hipótese Alternativa (H1**): Ao menos uma variável tem relação significativa com o custo do frete.
 
-## 7. Modelagem e análise da regressão
+## 7. Modelar e analisar a regressão
 
 ```{r}
 # Ajustar o modelo de regressão
@@ -390,12 +337,17 @@ anova(modelo)
 **ATIVIDADE\
 Escreva a equação da regressão**
 
-Custo Frete=−46.67 + 4.92\*distancia_km + 0.11\*peso_carga_kg + 192.45\*consumo_combustivel_kml + 1.63\*temperatura_ambiente + 0.61\*hora_envio
-
-## 8. Implicações e conclusões
+## 8. Interpretar e relatar o resultado
 
 **temperatura_ambiente** e **hora_envio** não são estatisticamente significativos, pois p\>0.05; ou seja, tem impacto irrelevante no modelo.
 
-Teste F Global mostrou um p-valor próximo de 0, mostrando que ao menos uma das variáveis independentes tem impacto significativo no custo do frete.
+Resíduos: Mediana próxima de zero. Erros não possuem um viés sistemático significativo. O erro padrão dos resíduos mostrou que, em média, houve uma diferença de R\$1.059,00 entre o valor predito e o valor real no custo do frete.
+
+A estatística F (razão entre a variabilidade explicada pelo modelo e a variabilidade residual) apresentou um valor alto, 1002, o que demonstra que o modelo tem boa predição da variabilidade dos resultados. O p-valor da estatística F próximo de 0 mostra que ao menos uma das variáveis independentes tem impacto significativo no custo do frete.
 
 R2 0.8375 e R2 ajustado de 0.8367, demonstrando que o modelo é consistente e tem um alto valor explicativo, apesar da pequena penalização pela inclusão de variáveis irrelevantes.
+
+A análise da variância do modelo reforça a ideia de que as variáveis Distância, Peso da carga e Consumo de combustível contribuem bastante para o modelo e que as variáveis Temperatura do ambiente e Hora do envio não são significativas.
+
+**ATIVIDADE\
+Ajustar o modelo para que tenha apenas as variáveis relevantes e comparar o resultado**
