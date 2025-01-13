@@ -83,15 +83,15 @@ library(tidyr)
 
 ```{r}
 
-relatorio1 <- read.csv("relatorio1.csv")
-relatorio2 <- read.csv("relatorio2.csv")
+#ATIVIDADE
 
-dadoscombinados <- merge(relatorio1, relatorio2, by = "id")
-
-# Visualizar cabeçalho para conferir se a extração foi correta:
-head(dadoscombinados)
+#ler arquivo 'relatorio1.csv'
+#ler arquivo 'relatorio2.csv'
 
 
+#criar um vetor 'dadoscombinados' usando a função merge usando a coluna 'id' como chave
+
+#conferir se dadoscombinados foi criado corretamente
 ```
 
 #### 1.2 Campos vazios
@@ -101,14 +101,17 @@ head(dadoscombinados)
 
 ```{r}
 
+#ATIVIDADE
+
 #contar quantas entradas em 'dadoscombinados' tem campos vazios
-sum(is.na(dadoscombinados))
 
-#criar novo conjunto de dados retirando campos vazios de 'dadoscombinados'
-dados_trata_NA <- tidyr::drop_na(dadoscombinados)
 
-#contar quantas entradas tem campos vazios no novo conjunto de dados criado (verificar se é 0!)
-sum(is.na(dados_trata_NA)) 
+#criar novo vetor 'dados_trata_NA' com os dados após retirada de campos vazios de 'dadoscombinados'. Usar a função drop_na()
+
+
+#contar quantas entradas tem campos vazios no novo conjunto de dados criado (verificar se é 0)
+
+
 ```
 
 **1.3 Dados inconsistentes e dados extremos**
@@ -116,7 +119,10 @@ sum(is.na(dados_trata_NA))
 Sumário estatístico prévio para entender os dados e identificar inconsistências
 
 ```{r}
-summary(dados_trata_NA)
+
+#ATIVIDADE:
+
+#criar um summary de 'dados_trata_NA'
 ```
 
 Tratar valores negativos no custo_frete
@@ -199,12 +205,13 @@ print(outliers_depois)
 
 ```
 
-**ATIVIDADE:\
-Refazer o tratamento de dados**
+```{r}
+#ATIVIDADE:Criar gráfico boxplot para visualizar os outliers de cada variável 
+#antes do tratamento
+#obs: vetor dos dados a ser utilizado é 'dados_trata_NA_nega'
 
-**ATIVIDADE:\
-Criar gráfico boxplot para visualizar os outliers de cada variável antes do tratamento\
-**obs: vetor dos dados a ser utilizado é 'dados_trata_NA_nega
+
+```
 
 ## 2. Descrição dos dados - Resumo estatístico
 
@@ -231,6 +238,12 @@ print(correlacoes)
 Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação\
 **Obs: use a função de correlação para os dados tratados finais: cor(dados_trata_final\[, c("var1", "var2", "var3" etc)\])\
 Você também pode usar o vetor que eu já criei anteriormente que guardou esses valores de correlação
+
+```{r}
+
+#PARA CONFECÇÃO DA MATRIZ DE CORRELAÇÃO
+
+```
 
 ## 4. Verificar pressupostos da regressão - garantir validade do modelo
 
@@ -297,6 +310,11 @@ Outra forma interessante de verificar a normalidade dos resíduos é a análise 
 **ATIVIDADE:\
 Desenvolva o gráfico Q-Q para o vetor 'modelo_vif'**
 
+```{r}
+#Usar a biblioteca 'coorplot' para exibir de forma gráfica a matriz de correlação
+#dica: fonte dos dados a ser utilizada: vetor 'correlacoes', de etapa anterior
+```
+
 ## 5. Calcular a amostra - verificar se o tamanho da amostra é adequado
 
 Estimar o tamanho mínimo necessário com base nos preditores e no poder estatístico.
@@ -335,7 +353,10 @@ anova(modelo)
 ```
 
 **ATIVIDADE\
-Escreva a equação da regressão**
+\*Escreva abaixo a equação da regressão!**
+
+::: {#Equa}
+:::
 
 ## 8. Interpretar e relatar o resultado
 
@@ -349,5 +370,5 @@ R2 0.8375 e R2 ajustado de 0.8367, demonstrando que o modelo é consistente e te
 
 A análise da variância do modelo reforça a ideia de que as variáveis Distância, Peso da carga e Consumo de combustível contribuem bastante para o modelo e que as variáveis Temperatura do ambiente e Hora do envio não são significativas.
 
-**ATIVIDADE\
+**ATIVIDADE PARA CASA\
 Ajustar o modelo para que tenha apenas as variáveis relevantes e comparar o resultado**
